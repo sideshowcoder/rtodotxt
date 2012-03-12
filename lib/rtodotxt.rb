@@ -46,6 +46,18 @@ module Rtodotxt
       return self
     end
     
+    def prio! p = ""
+      if p == ""
+        # Remove the priority
+        @text.gsub!(/\(.\)\s/, '')
+      elsif p.match(/\A.\Z/)
+        # Single char to be used as priority
+        @text = "(#{p.match(/\A.\Z/)[0].upcase}) #{@text}"
+      else
+        raise ArgumentError, "Illegal priority", caller
+      end
+    end
+    
   end
 
 end
