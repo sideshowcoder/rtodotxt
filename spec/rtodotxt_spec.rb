@@ -55,13 +55,13 @@ describe Rtodotxt::List do
   it "should sort a list by priority" do
     tl = Rtodotxt::List.new a_list
     tl_sorted = Rtodotxt::List.new a_list_sorted
-    tl.sort.should == tl_sorted.list
+    tl.sort.should == tl_sorted
   end
   
   it "should sort a list by done" do
     tl = Rtodotxt::List.new b_list
     tl_sorted = Rtodotxt::List.new b_list_sorted
-    tl.sort.should == tl_sorted.list
+    tl.sort.should == tl_sorted
   end
   
 end

@@ -3,26 +3,20 @@ require "date"
 
 module Rtodotxt
   
-  class List
-    include Enumerable
-    attr_accessor :list
+  class List < Array
     
     def initialize list
-      @list = self.class.gen_list_from_string list
+      super self.class.gen_list_from_string list
     end
-        
-    def each &block
-      @list.each { |todo| block.call todo }
-    end
-    
+            
     # Split a string by each line and generate an array of todos
-    def read( str )
-      @list = self.class.gen_list_from_string str
+    def read str
+      super self.class.gen_list_from_string str
     end
     
     # Join the todo text together to return the list 
     def print
-      str = @list.map { |t| t.text }.join "\n"
+      str = self.map { |t| t.text }.join "\n"
       # the result must end with a newline!
       str << "\n"
     end
