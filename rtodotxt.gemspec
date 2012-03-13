@@ -10,6 +10,9 @@ Gem::Specification.new do |gem|
 
   # Development dependencies
   gem.add_development_dependency "rspec", "~> 2.8"
+  gem.add_development_dependency "autotest", "~> 4.4.6"
+  gem.add_development_dependency "autotest-fsevent", "~> 0.2.8"
+  gem.add_development_dependency "autotest-growl", "~> 0.2.16"
 
   gem.executables   = `git ls-files -- bin/*`.split("\n").map{ |f| File.basename(f) }
   gem.files         = `git ls-files`.split("\n")

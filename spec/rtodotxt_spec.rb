@@ -1,4 +1,4 @@
-require "rtodotxt"
+require "spec_helper"
 
 a_list = "
 (A) Buy milk @supermarket +groceries
@@ -8,6 +8,31 @@ a_list = "
 Get some coffee +groceries
 "
 
+a_list_sorted = "
+(A) Buy bread @baker +groceries
+(A) Buy milk @supermarket +groceries
+(B) get phil to organize +bbq
+(C) Fix rtodotxt
+Get some coffee +groceries
+"
+
+b_list = "
+(C) Fix rtodotxt
+x 2012-03-13 get phil to organize +bbq
+(A) Buy bread @baker +groceries
+x 2012-03-13 Buy milk @supermarket +groceries
+Get some coffee +groceries
+"
+
+b_list_sorted = "
+(A) Buy bread @baker +groceries
+(C) Fix rtodotxt
+Get some coffee +groceries
+x 2012-03-13 Buy milk @supermarket +groceries
+x 2012-03-13 get phil to organize +bbq
+"
+
+
 a_todo = "Buy milk @supermarket +groceries"
 a_todo_prio = "(A) Buy milk @supermarket +groceries"
 a_todo_done = "x #{Date.today.to_s} Buy milk @supermarket +groceries"
@@ -15,6 +40,7 @@ a_todo_done = "x #{Date.today.to_s} Buy milk @supermarket +groceries"
 b_todo = "Get some coffee +groceries"
 b_todo_done = "x #{Date.today.to_s} Get some coffee +groceries"
 b_todo_prio = "(A) Get some coffee +groceries"
+
 
 describe Rtodotxt::List do
   
@@ -30,15 +56,17 @@ describe Rtodotxt::List do
     end
   end
         
-  it "should filter a list by word"
+  it "should sort a list by priority" do
+    tl = Rtodotxt::List.new a_list
+    tl_sorted = Rtodotxt::List.new a_list_sorted
+    tl.sort.list.should eql tl_sorted.list
+  end
 
-  it "should sort a list by priority"
-
-  it "should sort a list by done"
-  
-  it "should list contexts"
-  
-  it "should list projects"
+  it "should sort a list by done" do
+    tl = Rtodotxt::List.new b_list
+    tl_sorted = Rtodotxt::List.new b_list_sorted
+    tl.sort.list.should eql tl_sorted.list
+  end
   
 end
 
@@ -66,20 +94,32 @@ describe Rtodotxt::Todo do
   
   it "should unset priority" do
     t = Rtodotxt::Todo.new b_todo_prio
-    t.prio!.should eql b_todo
+    t.prio!("").should eql b_todo
   end
   
   it "should raise Argument error on illegal priority" do
     t = Rtodotxt::Todo.new b_todo_prio
     lambda { t.prio!("ABC") }.should raise_error
   end
+    
+  it "should give its contexts" do
+   t = Rtodotxt::Todo.new "(C) +bbq @supermarket go +get some +bbq stuff @home for @home" 
+   t.contexts.should eql ["supermarket", "home"]
+  end
   
-  it "should append to text"
+  it "should return its projects" do
+    t = Rtodotxt::Todo.new "(C) +bbq @supermarket go +get some +bbq stuff @home for @home" 
+    t.projects.should eql ["bbq", "get"]
+  end
+    
+  it "should return its priority" do
+    t = Rtodotxt::Todo.new "(C) something"
+    t.prio.should eql "C"
+  end
   
-  it "should give its contexts"
-  
-  it "should return its projects"
-  
-  it "should return its priority"
+  it "should return empty string for no priority" do
+    t = Rtodotxt::Todo.new "something"
+    t.prio.should eql ""
+  end
   
 end

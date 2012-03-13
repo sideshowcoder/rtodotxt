@@ -5,9 +5,13 @@ module Rtodotxt
   
   class List
     include Enumerable
+    include Comparable
     
     def initialize list
       @list = self.class.gen_list_from_string list
+    end
+    
+    def <=>(anOther)
     end
     
     def each &block
@@ -29,7 +33,7 @@ module Rtodotxt
     def self.gen_list_from_string str
       str.split( "\n" ).map!{ |line| Todo.new line }
     end
-       
+           
   end
   
   class Todo
@@ -43,10 +47,10 @@ module Rtodotxt
     def done!
       @text = "x #{Date.today.to_s} " + @text.gsub(/\(.\)\s/, '')
       # return self to allow method chaining
-      return self
+      self
     end
     
-    def prio! p = ""
+    def prio! p
       if p == ""
         # Remove the priority
         @text.gsub!(/\(.\)\s/, '')
@@ -56,6 +60,22 @@ module Rtodotxt
       else
         raise ArgumentError, "Illegal priority", caller
       end
+    end
+    
+    def prio
+      # Match the priority from the string
+      prio = @text.match( /\((.)\)/ )
+      prio.nil? ? "" : prio[1]
+    end
+    
+    def contexts
+      projects = @text.scan( /@(\S+)/ )
+      projects.uniq.flatten      
+    end
+    
+    def projects
+      projects = @text.scan( /\+(\S+)/ )
+      projects.uniq.flatten
     end
     
   end
