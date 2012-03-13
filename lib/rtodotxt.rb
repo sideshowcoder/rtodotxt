@@ -5,47 +5,64 @@ module Rtodotxt
   
   class List
     include Enumerable
-    include Comparable
+    attr_accessor :list
     
     def initialize list
       @list = self.class.gen_list_from_string list
     end
-    
-    def <=>(anOther)
-    end
-    
+        
     def each &block
       @list.each { |todo| block.call todo }
     end
     
     # Split a string by each line and generate an array of todos
-    def list=( str )
+    def read( str )
       @list = self.class.gen_list_from_string str
     end
     
     # Join the todo text together to return the list 
-    def list
+    def print
       str = @list.map { |t| t.text }.join "\n"
       # the result must end with a newline!
       str << "\n"
     end
     
     def self.gen_list_from_string str
-      str.split( "\n" ).map!{ |line| Todo.new line }
+      str.split( "\n" ).map! do |line| 
+        Todo.new line unless line.empty?
+      end
     end
-           
+               
   end
   
   class Todo
-    
+    include Comparable
     attr_accessor :text
     
     def initialize text
       @text = text
     end
     
+    # Compare todos, the order is reversed so that a printed list is in correct 
+    # order
+    def <=> a_todo
+      if done?
+        a_todo.done? ? 0 : 1
+      elsif a_todo.prio.empty? || prio.empty?
+        if a_todo.prio.empty? && prio.empty?
+          0
+        elsif a_todo.prio.empty?
+          -1
+        else
+          1
+        end
+      else
+        prio <=> a_todo.prio
+      end
+    end
+    
     def done!
-      @text = "x #{Date.today.to_s} " + @text.gsub(/\(.\)\s/, '')
+      @text = "x #{Date.today.to_s} " + @text.gsub( /\(.\)\s/, '' )
       # return self to allow method chaining
       self
     end
@@ -53,8 +70,8 @@ module Rtodotxt
     def prio! p
       if p == ""
         # Remove the priority
-        @text.gsub!(/\(.\)\s/, '')
-      elsif p.match(/\A.\Z/)
+        @text.gsub! /\(.\)\s/, ''
+      elsif p.match /\A.\Z/ 
         # Single char to be used as priority
         @text = "(#{p.match(/\A.\Z/)[0].upcase}) #{@text}"
       else
@@ -64,17 +81,22 @@ module Rtodotxt
     
     def prio
       # Match the priority from the string
-      prio = @text.match( /\((.)\)/ )
+      prio = @text.match(/\((.)\)/)
       prio.nil? ? "" : prio[1]
     end
     
+    def done?
+      # if todo text starts with x than it is done
+      @text.match( /\Ax\s/ ).nil? ? false : true
+    end
+    
     def contexts
-      projects = @text.scan( /@(\S+)/ )
+      projects = @text.scan /@(\S+)/ 
       projects.uniq.flatten      
     end
     
     def projects
-      projects = @text.scan( /\+(\S+)/ )
+      projects = @text.scan /\+(\S+)/
       projects.uniq.flatten
     end
     
