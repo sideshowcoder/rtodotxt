@@ -77,6 +77,11 @@ describe Rtodotxt::Todo do
     t = Rtodotxt::Todo.new b_todo 
     t.done!.text.should eql b_todo_done
   end
+  
+  it "should not change a done todo if mark is done is called" do
+    t = Rtodotxt::Todo.new b_todo_done
+    t.done!.text.should eql b_todo_done
+  end
 
   it "should mark as done with priority removed" do
     t = Rtodotxt::Todo.new a_todo_prio 

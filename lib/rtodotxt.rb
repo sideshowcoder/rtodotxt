@@ -56,7 +56,7 @@ module Rtodotxt
     end
     
     def done!
-      @text = "x #{Date.today.to_s} " + @text.gsub( /\(.\)\s/, '' )
+      @text = "x #{Date.today.to_s} " + @text.gsub( /\(.\)\s/, '' ) unless done?
       # return self to allow method chaining
       self
     end
