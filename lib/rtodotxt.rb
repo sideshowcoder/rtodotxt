@@ -85,8 +85,8 @@ module Rtodotxt
     end
     
     def contexts
-      projects = @text.scan /@(\S+)/ 
-      projects.uniq.flatten      
+      contexts = @text.scan /@(\S+)/ 
+      contexts.uniq.flatten      
     end
     
     def projects
